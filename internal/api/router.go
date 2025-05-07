@@ -1,0 +1,37 @@
+package api
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/token-cjg/mable-backend-code-test/internal/handler"
+	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+)
+
+type Server struct {
+	router *mux.Router
+}
+
+func New(rep *repo.Repo) *Server {
+	s := &Server{router: mux.NewRouter().StrictSlash(true)}
+
+	account := handler.NewAccount(rep)
+	company := handler.NewCompany(rep)
+	transfer := handler.NewTransfer(rep)
+
+	s.router.HandleFunc("/companies", company.Create).Methods(http.MethodPost)
+	s.router.HandleFunc("/companies", company.List).Methods(http.MethodGet)
+
+	s.router.HandleFunc("/companies/{id:[0-9]+}/accounts",
+		account.Create).Methods(http.MethodPost)
+	s.router.HandleFunc("/companies/{id:[0-9]+}/accounts",
+		account.ListByCompany).Methods(http.MethodGet)
+
+	s.router.HandleFunc("/transfer", transfer.Batch).Methods(http.MethodPost)
+
+	return s
+}
+
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
+}
