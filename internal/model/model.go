@@ -8,6 +8,7 @@ type Company struct {
 type Account struct {
 	ID      int64   `json:"account_id"`
 	Company int64   `json:"company_id"`
+	Number  string  `json:"account_number"`
 	Balance float64 `json:"account_balance"`
 }
 

@@ -54,15 +54,14 @@ func (r *Repo) CreateAccount(ctx context.Context, companyID int64, balance float
 	var a model.Account
 	err := r.db.QueryRowContext(ctx,
 		`INSERT INTO account (company_id, account_balance) VALUES ($1, $2)
-		 RETURNING account_id, company_id, account_balance`,
-		companyID, balance).
-		Scan(&a.ID, &a.Company, &a.Balance)
+		 RETURNING account_id, company_id, account_number, account_balance`,
+		companyID, balance).Scan(&a.ID, &a.Company, &a.Number, &a.Balance)
 	return a, err
 }
 
 func (r *Repo) ListAccountsByCompany(ctx context.Context, companyID int64) ([]model.Account, error) {
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT account_id, company_id, account_balance FROM account WHERE company_id=$1`, companyID)
+		`SELECT account_id, company_id, account_number, account_balance FROM account WHERE company_id=$1`, companyID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +70,7 @@ func (r *Repo) ListAccountsByCompany(ctx context.Context, companyID int64) ([]mo
 	accs := []model.Account{}
 	for rows.Next() {
 		var a model.Account
-		if err := rows.Scan(&a.ID, &a.Company, &a.Balance); err != nil {
+		if err := rows.Scan(&a.ID, &a.Company, &a.Number, &a.Balance); err != nil {
 			return nil, err
 		}
 		accs = append(accs, a)
@@ -82,8 +81,8 @@ func (r *Repo) ListAccountsByCompany(ctx context.Context, companyID int64) ([]mo
 func (r *Repo) GetAccountByID(ctx context.Context, accountID int64) (model.Account, error) {
 	var a model.Account
 	err := r.db.QueryRowContext(ctx,
-		`SELECT account_id, company_id, account_balance FROM account WHERE account_id=$1`,
-		accountID).Scan(&a.ID, &a.Company, &a.Balance)
+		`SELECT account_id, company_id, account_number, account_balance FROM account WHERE account_id=$1`,
+		accountID).Scan(&a.ID, &a.Company, &a.Number, &a.Balance)
 	return a, err
 }
 
@@ -101,7 +100,7 @@ func (r *Repo) Transfer(ctx context.Context, srcID, dstID int64, amount float64)
 
 	var srcBal float64
 	if err := tx.QueryRowContext(ctx,
-		`SELECT account_balance FROM account WHERE account_id=$1 FOR UPDATE`, srcID).
+		`SELECT account_balance FROM account WHERE account_number=$1 FOR UPDATE`, srcID).
 		Scan(&srcBal); err != nil {
 		return err
 	}
@@ -112,11 +111,11 @@ func (r *Repo) Transfer(ctx context.Context, srcID, dstID int64, amount float64)
 
 	// Debit & credit
 	if _, err := tx.ExecContext(ctx,
-		`UPDATE account SET account_balance = account_balance - $1 WHERE account_id=$2`, amount, srcID); err != nil {
+		`UPDATE account SET account_balance = account_balance - $1 WHERE account_number=$2`, amount, srcID); err != nil {
 		return err
 	}
 	if _, err := tx.ExecContext(ctx,
-		`UPDATE account SET account_balance = account_balance + $1 WHERE account_id=$2`, amount, dstID); err != nil {
+		`UPDATE account SET account_balance = account_balance + $1 WHERE account_number=$2`, amount, dstID); err != nil {
 		return err
 	}
 
