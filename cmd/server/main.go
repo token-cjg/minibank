@@ -5,53 +5,31 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/token-cjg/mable-backend-code-test/internal/db"
+	h "github.com/token-cjg/mable-backend-code-test/internal/http"
+	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
-// healthHandler is a simple “ping” endpoint.
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"status":"ok"}`))
-}
-
 func main() {
-	// Router setup
-	r := mux.NewRouter().StrictSlash(true)
+	pg, err := db.New()
+	if err != nil {
+		log.Fatalf("db: %v", err)
+	}
+	defer pg.Close()
 
-	// Routes – add more here
-	r.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
+	rep := repo.New(pg)
+	srv := h.NewServer(rep)
 
-	// Optional: global middleware example
-	r.Use(loggingMiddleware)
-
-	// Server
-	srv := &http.Server{
-		Handler:      r,
+	server := &http.Server{
 		Addr:         ":8080",
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		Handler:      srv,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
 	log.Println("🚀  listening on http://localhost:8080")
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server error: %v", err)
 	}
-}
-
-// loggingMiddleware prints each request in Apache‑style combined format.
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		defer func() {
-			log.Printf("%s %s %s %dms",
-				r.Method,
-				r.RequestURI,
-				r.UserAgent(),
-				time.Since(start).Milliseconds(),
-			)
-		}()
-		next.ServeHTTP(w, r)
-	})
 }
