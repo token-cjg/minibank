@@ -21,11 +21,14 @@ func New(rep *repo.Repo) *Server {
 
 	s.router.HandleFunc("/companies", company.Create).Methods(http.MethodPost)
 	s.router.HandleFunc("/companies", company.List).Methods(http.MethodGet)
+	s.router.HandleFunc("/companies/{id:[0-9]+}", company.GetByID).Methods(http.MethodGet)
 
 	s.router.HandleFunc("/companies/{id:[0-9]+}/accounts",
 		account.Create).Methods(http.MethodPost)
 	s.router.HandleFunc("/companies/{id:[0-9]+}/accounts",
 		account.ListByCompany).Methods(http.MethodGet)
+	s.router.HandleFunc("/companies/{id:[0-9]+}/accounts/{id:[0-9]+}",
+		account.GetByID).Methods(http.MethodGet)
 
 	s.router.HandleFunc("/transfer", transfer.Batch).Methods(http.MethodPost)
 

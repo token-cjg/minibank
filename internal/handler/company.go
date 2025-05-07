@@ -3,7 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
@@ -37,4 +39,15 @@ func (h *Company) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, cs)
+}
+
+/* GET /companies/{id} */
+func (h *Company) GetByID(w http.ResponseWriter, r *http.Request) {
+	companyID, _ := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	c, err := h.Repo.GetCompanyByID(r.Context(), companyID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, http.StatusOK, c)
 }

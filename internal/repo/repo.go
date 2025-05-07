@@ -40,6 +40,14 @@ func (r *Repo) ListCompanies(ctx context.Context) ([]model.Company, error) {
 	return list, rows.Err()
 }
 
+func (r *Repo) GetCompanyByID(ctx context.Context, companyID int64) (model.Company, error) {
+	var c model.Company
+	err := r.db.QueryRowContext(ctx,
+		`SELECT company_id, company_name FROM company WHERE company_id=$1`,
+		companyID).Scan(&c.ID, &c.Name)
+	return c, err
+}
+
 /* --------- Account --------- */
 
 func (r *Repo) CreateAccount(ctx context.Context, companyID int64, balance float64) (model.Account, error) {
@@ -69,6 +77,14 @@ func (r *Repo) ListAccountsByCompany(ctx context.Context, companyID int64) ([]mo
 		accs = append(accs, a)
 	}
 	return accs, rows.Err()
+}
+
+func (r *Repo) GetAccountByID(ctx context.Context, accountID int64) (model.Account, error) {
+	var a model.Account
+	err := r.db.QueryRowContext(ctx,
+		`SELECT account_id, company_id, account_balance FROM account WHERE account_id=$1`,
+		accountID).Scan(&a.ID, &a.Company, &a.Balance)
+	return a, err
 }
 
 /* --------- Transfer (business txn) --------- */

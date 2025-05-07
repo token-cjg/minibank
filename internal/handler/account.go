@@ -45,3 +45,14 @@ func (h *Account) ListByCompany(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(accs)
 }
+
+/* GET /companies/{id}/accounts/{id} */
+func (h *Account) GetByID(w http.ResponseWriter, r *http.Request) {
+	accountID, _ := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	acc, err := h.Repo.GetAccountByID(r.Context(), accountID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(acc)
+}
