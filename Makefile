@@ -44,7 +44,7 @@ lint:
 	@echo "Running linters..."
 	golangci-lint run ./... --config .golangci.yml
 
-lint-fix:
+lint_fix:
 	@echo "Running linters with auto-fix..."
 	golangci-lint run --fix ./... --config .golangci.yml
 	@echo "Linters completed successfully!"
