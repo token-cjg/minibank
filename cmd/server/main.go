@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/token-cjg/mable-backend-code-test/internal/api"
 	"github.com/token-cjg/mable-backend-code-test/internal/db"
-	h "github.com/token-cjg/mable-backend-code-test/internal/http"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	defer pg.Close()
 
 	rep := repo.New(pg)
-	srv := h.NewServer(rep)
+	srv := api.New(rep)
 
 	server := &http.Server{
 		Addr:         ":8080",

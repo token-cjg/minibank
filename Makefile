@@ -1,4 +1,4 @@
-.PHONY: db_create db_drop run db_migrate all
+.PHONY: db_create db_drop run db_migrate db_seed all
 
 db_create:
 	@echo "Creating bank database..."
@@ -14,4 +14,7 @@ run:
 db_migrate:
 	DATABASE_URL="postgres://postgres:postgres@localhost:5432/bank?sslmode=disable" go run ./cmd/migrate
 
-all: db_create db_migrate run
+db_seed:
+	DATABASE_URL="postgres://postgres:postgres@localhost:5432/bank?sslmode=disable" go run ./cmd/seed -dir ./fixtures -file seed.sql
+
+all: db_create db_migrate db_seed run
