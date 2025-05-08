@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func TestNewRepo(t *testing.T) {

@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 
-	"github.com/token-cjg/mable-backend-code-test/internal/model"
+	"github.com/token-cjg/minibank/internal/model"
 )
 
 func (r *Repo) CreateAccount(ctx context.Context, companyID int64, balance float64) (model.Account, error) {

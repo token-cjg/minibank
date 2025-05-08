@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/token-cjg/mable-backend-code-test/internal/api"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/api"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func newTestServer(t *testing.T) (*api.Server, sqlmock.Sqlmock) {

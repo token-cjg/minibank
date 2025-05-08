@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 
-	"github.com/token-cjg/mable-backend-code-test/internal/model"
+	"github.com/token-cjg/minibank/internal/model"
 )
 
 func (r *Repo) CreateCompany(ctx context.Context, name string) (model.Company, error) {
