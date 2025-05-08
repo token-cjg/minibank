@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/token-cjg/mable-backend-code-test/internal/handler"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/handler"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func depsTransfer(t *testing.T) (*handler.Transfer, sqlmock.Sqlmock) {

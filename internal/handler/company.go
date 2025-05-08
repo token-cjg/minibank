@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/token-cjg/mable-backend-code-test/internal/model"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/model"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 type Company struct{ Repo *repo.Repo }

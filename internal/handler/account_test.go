@@ -9,8 +9,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gorilla/mux"
-	"github.com/token-cjg/mable-backend-code-test/internal/handler"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/handler"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func newDeps(t *testing.T) (*handler.Account, sqlmock.Sqlmock) {

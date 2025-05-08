@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/token-cjg/mable-backend-code-test/internal/api"
-	"github.com/token-cjg/mable-backend-code-test/internal/db"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/api"
+	"github.com/token-cjg/minibank/internal/db"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func main() {

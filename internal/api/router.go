@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/token-cjg/mable-backend-code-test/internal/handler"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/handler"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 type Server struct {

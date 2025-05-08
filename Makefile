@@ -52,4 +52,3 @@ lint-fix:
 all: db_create db_migrate db_seed test coverage lint
 	@echo "All tasks completed successfully!"
 	@echo "You can now run the server with 'make run'."
-

@@ -1,4 +1,4 @@
-module github.com/token-cjg/mable-backend-code-test
+module github.com/token-cjg/minibank
 
 go 1.23.4
 

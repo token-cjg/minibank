@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/token-cjg/mable-backend-code-test/internal/db"
+	"github.com/token-cjg/minibank/internal/db"
 )
 
 func TestNew_NoDatabaseURL(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/token-cjg/mable-backend-code-test/internal/model"
-	"github.com/token-cjg/mable-backend-code-test/internal/repo"
+	"github.com/token-cjg/minibank/internal/model"
+	"github.com/token-cjg/minibank/internal/repo"
 )
 
 func TestCreateAccount(t *testing.T) {
