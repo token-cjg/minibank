@@ -1,3 +1,6 @@
+// Package db provides a database connection for the application.
+// It uses the pgx driver for PostgreSQL and sets up connection pooling.
+// The connection pool settings are configured to optimize performance.
 package db
 
 import (

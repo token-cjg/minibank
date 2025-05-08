@@ -16,9 +16,33 @@ type Transfer struct{ Repo *repo.Repo }
 
 func NewTransfer(r *repo.Repo) *Transfer { return &Transfer{Repo: r} }
 
-const FILE_UPLOAD_FIELD = "file"
+const FileUploadField = "file"
 
-/* POST /transfer  (Content‑Type: text/csv) */
+/* Batch is a handler for transferring money between accounts.
+ * 	POST /transfer
+ * 	Content-Type: multipart/form-data
+ * 	Body: {"file": <file>}
+ * 	OR
+ * 	Content-Type: text/csv
+ * 	Body: <csv data>
+ * 	CSV format: <source_account_id>,<target_account_id>,<amount>
+ * 	Example:
+ * 		1,2,100.50
+ * 		3,4,200.00
+ * 		5,6,300.75
+ * 	Returns:
+ * 		201 Created
+ * 		400 Bad Request if the CSV is malformed or the request is not multipart/form-data
+ * 		500 Internal Server Error if the server encounters an error
+ * 	Notes:
+ * 		- The CSV file can be uploaded as a file part in a multipart/form-data request.
+ * 		- The CSV file can also be sent as a text/csv request body.
+ * 		- The CSV file must contain three columns: source_account_id, target_account_id, and amount.
+ * 		- The source_account_id and target_account_id must be valid account IDs.
+ * 		- The amount must be a valid float64 value.
+ * 		- The transfer will be processed in a batch, and the response will indicate the status of the transfer.
+ * 		- The transfer will be processed in the order they appear in the CSV file.
+ */
 func (h *Transfer) Batch(w http.ResponseWriter, r *http.Request) {
 	ct := r.Header.Get("Content-Type")
 
@@ -31,7 +55,7 @@ func (h *Transfer) Batch(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "bad multipart form: "+err.Error(), http.StatusBadRequest)
 			return
 		}
-		file, _, err := r.FormFile(FILE_UPLOAD_FIELD)
+		file, _, err := r.FormFile(FileUploadField)
 		if err != nil {
 			http.Error(w, "missing file: "+err.Error(), http.StatusBadRequest)
 			return
@@ -77,9 +101,6 @@ func (h *Transfer) Batch(w http.ResponseWriter, r *http.Request) {
 
 	if berr := h.Repo.BatchTransfer(r.Context(), txns); berr != nil {
 		status := http.StatusInternalServerError
-		if berr.Err == repo.ErrInsufficient {
-			status = http.StatusConflict
-		}
 		resp := map[string]any{"error": berr.Err.Error(), "row": berr.Row + 1}
 		writeJSON(w, status, resp)
 		return

@@ -1,3 +1,6 @@
+// Package model contains the data structures used in the application.
+// It is used to define the data models for the database entities.
+// The models are used in the repository layer to interact with the database.
 package model
 
 type Company struct {

@@ -6,6 +6,7 @@
 - Start postgres.
 - Run `make db_create` && `make db_migrate` to create the database + load the schema.
 - Open a db client like DBeaver to view your database `bank`.
+- `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`.
 
 Then
 
