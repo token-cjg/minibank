@@ -11,3 +11,9 @@
 Then
 
 - `make run`.
+
+### Running basic checks
+
+- `make lint` to run lint checks
+- `make test` to run the test suite
+- `make coverage` to run tests + check coverage
