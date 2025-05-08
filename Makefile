@@ -1,4 +1,4 @@
-.PHONY: db_create db_drop run db_migrate db_seed test coverage all
+.PHONY: db_create db_drop run db_migrate db_seed test coverage docs serve_docs all
 
 db_create:
 	@echo "Creating bank database..."
@@ -43,6 +43,28 @@ lint:
     }
 	@echo "Running linters..."
 	golangci-lint run ./... --config .golangci.yml
+
+docs:
+	@echo "Checking if go-docs is installed, if not, installing..."
+	@command -v gomarkdoc >/dev/null 2>&1 || { \
+		echo "Installing gomarkdoc..."; \
+		go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest; \
+		echo "gomarkdoc installed successfully!"; \
+	}
+	@echo "📝  generating Markdown docs ➜ docs/api.md"
+	@mkdir -p docs
+	@gomarkdoc --output docs/api.md ./...
+
+serve_docs:
+	@echo "🌐 browse http://localhost:6060/github.com/token-cjg/minibank"
+	@command -v pkgsite >/dev/null 2>&1 || { \
+		echo "Installing pkgsite..."; \
+		go install golang.org/x/pkgsite/cmd/pkgsite@latest; \
+		echo "pkgsite installed successfully!"; \
+	}
+	@echo "Running pkgsite..."
+	@echo "You can view the documentation at http://localhost:6060/github.com/token-cjg/minibank"
+	@pkgsite -http "localhost:6060" -open
 
 lint_fix:
 	@echo "Running linters with auto-fix..."
