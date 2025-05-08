@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"bytes"
@@ -8,13 +8,14 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/token-cjg/mable-backend-code-test/internal/handler"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
-func depsCompany(t *testing.T) (*Company, sqlmock.Sqlmock) {
+func depsCompany(t *testing.T) (*handler.Company, sqlmock.Sqlmock) {
 	t.Helper()
 	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
-	return NewCompany(repo.New(db)), mock
+	return handler.NewCompany(repo.New(db)), mock
 }
 
 func call(h http.HandlerFunc, method, url string, body []byte) *httptest.ResponseRecorder {

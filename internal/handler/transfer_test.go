@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"bytes"
@@ -7,13 +7,14 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/token-cjg/mable-backend-code-test/internal/handler"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
-func depsTransfer(t *testing.T) (*Transfer, sqlmock.Sqlmock) {
+func depsTransfer(t *testing.T) (*handler.Transfer, sqlmock.Sqlmock) {
 	t.Helper()
 	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
-	return NewTransfer(repo.New(db)), mock
+	return handler.NewTransfer(repo.New(db)), mock
 }
 
 func TestTransferBatch_OK_OneRow(t *testing.T) {

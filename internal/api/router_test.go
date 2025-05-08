@@ -1,4 +1,4 @@
-package api
+package api_test
 
 import (
 	"bytes"
@@ -8,10 +8,11 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/token-cjg/mable-backend-code-test/internal/api"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
-func newTestServer(t *testing.T) (*Server, sqlmock.Sqlmock) {
+func newTestServer(t *testing.T) (*api.Server, sqlmock.Sqlmock) {
 	t.Helper()
 
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
@@ -20,11 +21,11 @@ func newTestServer(t *testing.T) (*Server, sqlmock.Sqlmock) {
 	}
 	// repo wraps our fake *sql.DB
 	rp := repo.New(db)
-	srv := New(rp)
+	srv := api.New(rp)
 	return srv, mock
 }
 
-func perform(t *testing.T, srv *Server, method, path string, body []byte) *httptest.ResponseRecorder {
+func perform(t *testing.T, srv *api.Server, method, path string, body []byte) *httptest.ResponseRecorder {
 	t.Helper()
 
 	req := httptest.NewRequest(method, path, bytes.NewReader(body))
