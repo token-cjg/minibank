@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
@@ -15,21 +16,45 @@ type Transfer struct{ Repo *repo.Repo }
 
 func NewTransfer(r *repo.Repo) *Transfer { return &Transfer{Repo: r} }
 
+const FILE_UPLOAD_FIELD = "file"
+
 /* POST /transfer  (Content‑Type: text/csv) */
 func (h *Transfer) Batch(w http.ResponseWriter, r *http.Request) {
-	if ct := r.Header.Get("Content-Type"); ct != "text/csv" && ct != "text/plain" {
-		http.Error(w, "expect Content-Type: text/csv", http.StatusUnsupportedMediaType)
+	ct := r.Header.Get("Content-Type")
+
+	var csvReader *csv.Reader
+
+	switch {
+	case strings.HasPrefix(ct, "multipart/form-data"):
+		// Parse up to 10 MB of file parts into memory before spilling to disk
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			http.Error(w, "bad multipart form: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		file, _, err := r.FormFile(FILE_UPLOAD_FIELD)
+		if err != nil {
+			http.Error(w, "missing file: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+		defer file.Close()
+		csvReader = csv.NewReader(file)
+
+	case ct == "text/csv" || ct == "text/plain":
+		csvReader = csv.NewReader(r.Body)
+		defer r.Body.Close()
+
+	default:
+		http.Error(w, "expect multipart/form-data or text/csv", http.StatusUnsupportedMediaType)
 		return
 	}
 
-	csvr := csv.NewReader(r.Body)
-	csvr.FieldsPerRecord = 3
+	csvReader.FieldsPerRecord = 3
 	defer r.Body.Close()
 
 	var txns []repo.TransferInput
 	line := 1
 	for {
-		rec, err := csvr.Read()
+		rec, err := csvReader.Read()
 		if err == io.EOF {
 			break
 		}
