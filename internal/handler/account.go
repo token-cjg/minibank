@@ -1,3 +1,4 @@
+// Package handler provides HTTP handlers for managing accounts and transactions.
 package handler
 
 import (
@@ -6,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/token-cjg/mable-backend-code-test/internal/model"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
@@ -13,7 +15,13 @@ type Account struct{ Repo *repo.Repo }
 
 func NewAccount(r *repo.Repo) *Account { return &Account{Repo: r} }
 
-/* POST /companies/{id}/accounts */
+/*
+Create is a handler for creating a new account.
+
+	POST /companies/{id}/accounts
+	Content-Type: application/json
+	Body: {"initial_balance": 1000.0}
+*/
 func (h *Account) Create(w http.ResponseWriter, r *http.Request) {
 	companyID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	if err != nil {
@@ -35,7 +43,10 @@ func (h *Account) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(acct)
 }
 
-/* GET /companies/{id}/accounts */
+/*
+	 ListByCompany is a handler for listing all accounts for a company.
+		GET /companies/{id}/accounts
+*/
 func (h *Account) ListByCompany(w http.ResponseWriter, r *http.Request) {
 	companyID, _ := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	accs, err := h.Repo.ListAccountsByCompany(r.Context(), companyID)
@@ -43,10 +54,17 @@ func (h *Account) ListByCompany(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if accs == nil {
+		accs = []model.Account{}
+	}
 	json.NewEncoder(w).Encode(accs)
 }
 
-/* GET /companies/{id}/accounts/{id} */
+/*
+GetByID is a handler for getting an account by its ID.
+
+	GET /companies/{id}/accounts/{id}
+*/
 func (h *Account) GetByID(w http.ResponseWriter, r *http.Request) {
 	accountID, _ := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	acc, err := h.Repo.GetAccountByID(r.Context(), accountID)

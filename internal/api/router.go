@@ -1,3 +1,7 @@
+// Package api provides the HTTP server and routing for the application.
+// It uses the Gorilla Mux router for handling HTTP requests and responses.
+// The server is responsible for defining the API endpoints and their handlers.
+// It also sets up the necessary middleware for logging and error handling.
 package api
 
 import (
