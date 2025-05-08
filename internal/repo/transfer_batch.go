@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type TransferInput struct {
@@ -44,10 +45,17 @@ func (r *Repo) Transfer(ctx context.Context, srcNum, dstNum int64, amount float6
 	// lock + fetch source id & balance
 	if err := tx.QueryRowContext(ctx,
 		`SELECT account_id, account_balance
-		   FROM account
-		  WHERE account_number = $1
-		  FOR UPDATE`,
+		FROM account
+		WHERE account_number = $1
+		FOR UPDATE`,
 		srcNum).Scan(&srcID, &srcBal); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			msg := fmt.Sprintf("tx declined, source account not found: %d", srcNum)
+			if err := r.insertTx(ctx, tx, nil, nil, amount, &msg); err != nil {
+				return err
+			}
+			return tx.Commit()
+		}
 		return err
 	}
 
@@ -57,12 +65,21 @@ func (r *Repo) Transfer(ctx context.Context, srcNum, dstNum int64, amount float6
 		   FROM account
 		  WHERE account_number = $1`,
 		dstNum).Scan(&dstID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			msg := fmt.Sprintf("tx declined, target account not found: %d", dstNum)
+			if err := r.insertTx(ctx, tx, nil, nil, amount, &msg); err != nil {
+				return err
+			}
+			return tx.Commit()
+		}
 		return err
 	}
 
 	if srcBal < amount {
-		msg := "insufficient balance"
-		_ = r.insertTx(ctx, tx, srcID, dstID, amount, &msg)
+		msg := "tx declined, insufficient balance"
+		if err := r.insertTx(ctx, tx, &srcID, &dstID, amount, &msg); err != nil {
+			return err
+		}
 		return tx.Commit()
 	}
 
@@ -82,14 +99,14 @@ func (r *Repo) Transfer(ctx context.Context, srcNum, dstNum int64, amount float6
 		return err
 	}
 
-	if err := r.insertTx(ctx, tx, srcID, dstID, amount, nil); err != nil {
+	if err := r.insertTx(ctx, tx, &srcID, &dstID, amount, nil); err != nil {
 		return err
 	}
 	return tx.Commit()
 }
 
 func (r *Repo) insertTx(ctx context.Context, q execer,
-	srcID, dstID int64, amount float64, errMsg *string) error {
+	srcID, dstID *int64, amount float64, errMsg *string) error {
 	_, err := q.ExecContext(ctx,
 		`INSERT INTO transaction
              (source_account_id, target_account_id, transfer_amount, error)
