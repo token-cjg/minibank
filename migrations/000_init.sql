@@ -27,8 +27,8 @@ CREATE TABLE IF NOT EXISTS account (
 
 CREATE TABLE IF NOT EXISTS transaction (
   tx_id              SERIAL PRIMARY KEY,
-  source_account_id  BIGINT NOT NULL REFERENCES account(account_id),
-  target_account_id  BIGINT NOT NULL REFERENCES account(account_id),
+  source_account_id  BIGINT REFERENCES account(account_id),
+  target_account_id  BIGINT REFERENCES account(account_id),
   transfer_amount    NUMERIC(18,2) NOT NULL CHECK (transfer_amount > 0),
   created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
   error              TEXT NULL

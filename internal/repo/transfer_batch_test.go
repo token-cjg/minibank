@@ -120,7 +120,7 @@ func TestTransfer_Insufficient(t *testing.T) {
 	// In insufficient scenario, an insert occurs with an error message.
 	// Note: Since sqlmock compares pointer equality for non-basic types,
 	// construct the expected argument as a pointer.
-	msg := "insufficient balance"
+	msg := "tx declined, insufficient balance"
 	mock.ExpectExec(regexp.QuoteMeta(
 		`INSERT INTO transaction
              (source_account_id, target_account_id, transfer_amount, error)
