@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/token-cjg/mable-backend-code-test/internal/model"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
@@ -37,6 +38,9 @@ func (h *Company) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+	if cs == nil {
+		cs = []model.Company{}
 	}
 	writeJSON(w, http.StatusOK, cs)
 }
