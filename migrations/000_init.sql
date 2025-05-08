@@ -1,17 +1,20 @@
-CREATE SEQUENCE account_number_seq
+-- 1. Sequence ----------------------------------------------------
+CREATE SEQUENCE IF NOT EXISTS account_number_seq
   AS BIGINT
-  START     WITH 1000000000000000     -- 10^15  (first 16‑digit number)
-  INCREMENT BY   1
-  MINVALUE  1000000000000000
-  MAXVALUE  9999999999999999          -- 10^16‑1
-  NO CYCLE;                           --   stop if we ever hit the max
+  START WITH 1000000000000000
+  INCREMENT BY 1
+  MINVALUE 1000000000000000
+  MAXVALUE 9999999999999999
+  NO CYCLE;
 
-CREATE TABLE company (
+-- 2. Tables ------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS company (
   company_id   SERIAL PRIMARY KEY,
   company_name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE account (
+CREATE TABLE IF NOT EXISTS account (
   account_id      BIGSERIAL PRIMARY KEY,
   company_id      INT NOT NULL
                    REFERENCES company(company_id) ON DELETE CASCADE,
@@ -21,14 +24,23 @@ CREATE TABLE account (
   CHECK (account_balance >= 0),
   CHECK (account_number BETWEEN 1000000000000000 AND 9999999999999999)
 );
-CREATE INDEX idx_account_number ON account(account_number);  -- fast lookup
 
-CREATE TABLE transaction (
+CREATE TABLE IF NOT EXISTS transaction (
   tx_id              SERIAL PRIMARY KEY,
-  source_account_id  INT NOT NULL REFERENCES account(account_id),
-  target_account_id  INT NOT NULL REFERENCES account(account_id),
+  source_account_id  BIGINT NOT NULL REFERENCES account(account_id),
+  target_account_id  BIGINT NOT NULL REFERENCES account(account_id),
   transfer_amount    NUMERIC(18,2) NOT NULL CHECK (transfer_amount > 0),
-  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now(),
+  error              TEXT NULL
 );
-CREATE INDEX idx_transaction_source ON transaction(source_account_id);
-CREATE INDEX idx_transaction_target ON transaction(target_account_id);
+
+-- 3. Indexes -----------------------------------------------------
+
+CREATE INDEX IF NOT EXISTS idx_account_number
+        ON account(account_number);
+
+CREATE INDEX IF NOT EXISTS idx_transaction_source
+        ON transaction(source_account_id);
+
+CREATE INDEX IF NOT EXISTS idx_transaction_target
+        ON transaction(target_account_id);
