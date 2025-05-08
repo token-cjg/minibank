@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/token-cjg/mable-backend-code-test/internal/model"
 	"github.com/token-cjg/mable-backend-code-test/internal/repo"
 )
 
@@ -42,6 +43,9 @@ func (h *Account) ListByCompany(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+	if accs == nil {
+		accs = []model.Account{}
 	}
 	json.NewEncoder(w).Encode(accs)
 }
